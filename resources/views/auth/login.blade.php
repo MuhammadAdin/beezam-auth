@@ -438,7 +438,7 @@
 
             {{-- Email --}}
             <div class="form-group">
-                <label class="form-label" for="email">Email Admin</label>
+                <label class="form-label" for="email">Email</label>
                 <div class="input-shell @error('email') is-invalid @enderror">
                     <i class="bi bi-envelope shell-icon"></i>
                     <input

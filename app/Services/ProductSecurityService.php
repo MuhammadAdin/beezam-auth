@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PublicFile;
 
 class ProductSecurityService
 {
@@ -80,7 +80,7 @@ class ProductSecurityService
                          ->errorCorrection('H')
                          ->generate($url);
 
-        Storage::disk('public_uploads')->put($fileName, $qrImage);
+        PublicFile::put($fileName, $qrImage);
 
         return $fileName;
     }

@@ -44,16 +44,6 @@ return [
             'throw' => false,
         ],
 
-        // Disk untuk hosting TANPA symlink: file disimpan langsung di public/storage,
-        // sehingga bisa diakses lewat asset('storage/...') tanpa `php artisan storage:link`.
-        'public_uploads' => [
-            'driver' => 'local',
-            'root' => public_path('storage'),
-            'url' => env('APP_URL').'/storage',
-            'visibility' => 'public',
-            'throw' => false,
-        ],
-
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

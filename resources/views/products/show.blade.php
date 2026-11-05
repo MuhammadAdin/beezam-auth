@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@php use Illuminate\Support\Facades\Storage; @endphp
+@php use App\Support\PublicFile; @endphp
 
 @section('title', 'Detail Produk')
 @section('page-title', 'Detail Produk')
@@ -34,7 +34,7 @@
             </div>
             <div class="card-body text-center">
 
-                @if($product->qr_code && Storage::disk('public_uploads')->exists($product->qr_code))
+               @if(PublicFile::exists($product->qr_code))
                     <img
                         src="{{ asset('storage/' . $product->qr_code) }}"
                         alt="QR Code {{ $product->kode_produk }}"

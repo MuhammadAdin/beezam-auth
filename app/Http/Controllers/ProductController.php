@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Services\ProductSecurityService;
 use Illuminate\Support\Facades\Storage;
+use App\Support\PublicFile;
 
 class ProductController extends Controller
 {
@@ -59,9 +60,7 @@ class ProductController extends Controller
     {
         $categoryId = $product->category_id;
 
-        if ($product->qr_code && Storage::disk('public_uploads')->exists($product->qr_code)) {
-            Storage::disk('public_uploads')->delete($product->qr_code);
-        }
+        PublicFile::delete($product->qr_code);
 
         $product->delete();
 

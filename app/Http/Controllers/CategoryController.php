@@ -9,6 +9,7 @@ use App\Models\LabelTemplate;
 use App\Services\ProductSecurityService;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Support\PublicFile;
 
 class CategoryController extends Controller
 {
@@ -54,10 +55,8 @@ class CategoryController extends Controller
         ]);
 
         if ($request->hasFile('foto_produk')) {
-            $data['foto_produk'] = $request->file('foto_produk')
-                                           ->store('foto_kategori', 'public_uploads');
+            $data['foto_produk'] = PublicFile::upload($request->file('foto_produk'), 'foto_kategori');
         }
-
         Category::create($data);
 
         return redirect()->route('categories.index')
@@ -99,21 +98,14 @@ class CategoryController extends Controller
         ]);
 
         if ($request->hasFile('foto_produk')) {
-            if ($category->foto_produk &&
-                Storage::disk('public_uploads')->exists($category->foto_produk)) {
-                Storage::disk('public_uploads')->delete($category->foto_produk);
-            }
-            $data['foto_produk'] = $request->file('foto_produk')
-                                           ->store('foto_kategori', 'public_uploads');
-        }
+    PublicFile::delete($category->foto_produk);
+    $data['foto_produk'] = PublicFile::upload($request->file('foto_produk'), 'foto_kategori');
+}
 
-        if ($request->has('hapus_foto') && !$request->hasFile('foto_produk')) {
-            if ($category->foto_produk &&
-                Storage::disk('public_uploads')->exists($category->foto_produk)) {
-                Storage::disk('public_uploads')->delete($category->foto_produk);
-            }
-            $data['foto_produk'] = null;
-        }
+if ($request->has('hapus_foto') && !$request->hasFile('foto_produk')) {
+    PublicFile::delete($category->foto_produk);
+    $data['foto_produk'] = null;
+}
 
         $category->update($data);
 
@@ -123,17 +115,11 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        if ($category->foto_produk &&
-            Storage::disk('public_uploads')->exists($category->foto_produk)) {
-            Storage::disk('public_uploads')->delete($category->foto_produk);
-        }
+        PublicFile::delete($category->foto_produk);
 
-        foreach ($category->products as $product) {
-            if ($product->qr_code &&
-                Storage::disk('public_uploads')->exists($product->qr_code)) {
-                Storage::disk('public_uploads')->delete($product->qr_code);
-            }
-        }
+foreach ($category->products as $product) {
+    PublicFile::delete($product->qr_code);
+}
 
         $category->delete();
 
@@ -197,9 +183,9 @@ class CategoryController extends Controller
                 $errors[] = 'Unit ke-' . ($i + 1) . ' gagal dibuat (lihat storage/logs/laravel.log).';
 
                 // Bersihkan file QR yatim bila produk gagal tersimpan
-                if (!empty($qrCode) && Storage::disk('public_uploads')->exists($qrCode)) {
-                    Storage::disk('public_uploads')->delete($qrCode);
-                }
+               if (!empty($qrCode)) {
+    PublicFile::delete($qrCode);
+}
             }
         }
 
@@ -219,11 +205,8 @@ class CategoryController extends Controller
     public function clearUnits(Category $category)
     {
         foreach ($category->products as $product) {
-            if ($product->qr_code &&
-                Storage::disk('public_uploads')->exists($product->qr_code)) {
-                Storage::disk('public_uploads')->delete($product->qr_code);
-            }
-        }
+    PublicFile::delete($product->qr_code);
+}
 
         $category->products()->delete();
 

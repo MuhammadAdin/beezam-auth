@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\LabelTemplate;
 use App\Models\Product;
 use App\Models\Category;
+use App\Support\PublicFile;
 use Illuminate\Support\Facades\Storage;
 
 class LabelController extends Controller
@@ -36,7 +37,7 @@ class LabelController extends Controller
                         pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
                     )
                   . '.' . $file->extension();
-        $path     = $file->storeAs('labels', $fileName, 'public_uploads');
+       $path     = PublicFile::upload($file, 'labels', $fileName);
 
         LabelTemplate::create([
             'nama_template' => $request->nama_template,
@@ -52,10 +53,7 @@ class LabelController extends Controller
 
     public function destroy(LabelTemplate $label)
     {
-        if (Storage::disk('public_uploads')->exists($label->file_template)) {
-            Storage::disk('public_uploads')->delete($label->file_template);
-        }
-
+        PublicFile::delete($label->file_template);
         $label->delete();
 
         return redirect()->route('labels.index')
